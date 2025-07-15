@@ -10,8 +10,8 @@ import reducer, {
 
 import { TConstructorIngredient, TIngredient, TOrder } from '@utils-types';
 
-// Фикстуры
-const bun: TIngredient = {
+//Фикстуры и константы
+const BUN: TIngredient = {
   _id: '643d69a5c3f7b9001cfa093c',
   name: 'Краторная булка N-200i',
   type: 'bun',
@@ -26,7 +26,7 @@ const bun: TIngredient = {
   __v: 0
 };
 
-const ingredient1: TConstructorIngredient = {
+const INGREDIENT_1: TConstructorIngredient = {
   id: '1',
   count: 1,
   _id: '643d69a5c3f7b9001cfa093e',
@@ -43,7 +43,7 @@ const ingredient1: TConstructorIngredient = {
   __v: 0
 };
 
-const ingredient2: TConstructorIngredient = {
+const INGREDIENT_2: TConstructorIngredient = {
   id: '2',
   count: 2,
   _id: '643d69a5c3f7b9001cfa093e',
@@ -60,7 +60,7 @@ const ingredient2: TConstructorIngredient = {
   __v: 0
 };
 
-const orderData: TOrder = {
+const ORDER_DATA: TOrder = {
   _id: 'order1',
   status: 'done',
   name: 'Test order',
@@ -73,7 +73,7 @@ const orderData: TOrder = {
   ]
 };
 
-const initialState = {
+const INITIAL_STATE = {
   bun: null,
   ingredients: [],
   orderRequest: false,
@@ -82,52 +82,58 @@ const initialState = {
 
 describe('constructorSlice', () => {
   it('возвращает initialState по умолчанию', () => {
-    expect(reducer(undefined, { type: 'unknown' })).toEqual(initialState);
+    expect(reducer(undefined, { type: 'unknown' })).toEqual(INITIAL_STATE);
   });
 
   it('устанавливает булку', () => {
-    const nextState = reducer(initialState, setBun(bun));
-    expect(nextState.bun).toEqual(bun);
+    const nextState = reducer(INITIAL_STATE, setBun(BUN));
+    expect(nextState.bun).toEqual(BUN);
   });
 
   it('добавляет ингредиент', () => {
-    const nextState = reducer(initialState, addIngredient(ingredient1));
+    const nextState = reducer(INITIAL_STATE, addIngredient(INGREDIENT_1));
     expect(nextState.ingredients).toHaveLength(1);
-    expect(nextState.ingredients[0]).toEqual(ingredient1);
+    expect(nextState.ingredients[0]).toEqual(INGREDIENT_1);
   });
 
   it('удаляет ингредиент по id', () => {
-    const state = { ...initialState, ingredients: [ingredient1, ingredient2] };
+    const state = {
+      ...INITIAL_STATE,
+      ingredients: [INGREDIENT_1, INGREDIENT_2]
+    };
     const nextState = reducer(state, removeIngredient('1'));
     expect(nextState.ingredients).toHaveLength(1);
-    expect(nextState.ingredients[0]).toEqual(ingredient2);
+    expect(nextState.ingredients[0]).toEqual(INGREDIENT_2);
   });
 
   it('меняет порядок ингредиентов', () => {
-    const state = { ...initialState, ingredients: [ingredient1, ingredient2] };
+    const state = {
+      ...INITIAL_STATE,
+      ingredients: [INGREDIENT_1, INGREDIENT_2]
+    };
     const nextState = reducer(state, moveIngredient({ from: 0, to: 1 }));
-    expect(nextState.ingredients[0]).toEqual(ingredient2);
-    expect(nextState.ingredients[1]).toEqual(ingredient1);
+    expect(nextState.ingredients[0]).toEqual(INGREDIENT_2);
+    expect(nextState.ingredients[1]).toEqual(INGREDIENT_1);
   });
 
   it('очищает конструктор', () => {
     const state = {
-      bun,
-      ingredients: [ingredient1],
+      bun: BUN,
+      ingredients: [INGREDIENT_1],
       orderRequest: true,
-      orderModalData: orderData
+      orderModalData: ORDER_DATA
     };
     const nextState = reducer(state, clearConstructor());
-    expect(nextState).toEqual(initialState);
+    expect(nextState).toEqual(INITIAL_STATE);
   });
 
   it('устанавливает флаг orderRequest', () => {
-    const nextState = reducer(initialState, setOrderRequest(true));
+    const nextState = reducer(INITIAL_STATE, setOrderRequest(true));
     expect(nextState.orderRequest).toBe(true);
   });
 
   it('устанавливает данные модального окна заказа', () => {
-    const nextState = reducer(initialState, setOrderModalData(orderData));
-    expect(nextState.orderModalData).toEqual(orderData);
+    const nextState = reducer(INITIAL_STATE, setOrderModalData(ORDER_DATA));
+    expect(nextState.orderModalData).toEqual(ORDER_DATA);
   });
 });

@@ -6,6 +6,22 @@ import authReducer, {
   setUser
 } from '../authSlice';
 
+// Моки и константы
+const TEST_EMAIL = 'test@mail.com';
+const TEST_USER = { name: 'Test', email: TEST_EMAIL };
+const ACCESS_TOKEN = 'abc';
+const REFRESH_TOKEN = 'def';
+const ERROR_MSG = 'Ошибка регистрации';
+const REGISTER_PAYLOAD = {
+  success: true,
+  user: TEST_USER,
+  accessToken: ACCESS_TOKEN,
+  refreshToken: REFRESH_TOKEN
+};
+const FORGOT_PAYLOAD = {
+  success: true,
+  message: 'Reset email sent'
+};
 const initialState = {
   isAuth: false,
   user: null,
@@ -28,27 +44,26 @@ describe('authSlice', () => {
   });
 
   it('обрабатывает setUser', () => {
-    const user = { name: 'Test', email: 'test@mail.com' };
-    const nextState = authReducer(initialState, setUser(user));
-    expect(nextState.user).toEqual(user);
+    const nextState = authReducer(initialState, setUser(TEST_USER));
+    expect(nextState.user).toEqual(TEST_USER);
   });
 
   it('обрабатывает setTokens', () => {
     const nextState = authReducer(
       initialState,
-      setTokens({ accessToken: 'abc', refreshToken: 'def' })
+      setTokens({ accessToken: ACCESS_TOKEN, refreshToken: REFRESH_TOKEN })
     );
-    expect(nextState.accessToken).toBe('abc');
-    expect(nextState.refreshToken).toBe('def');
+    expect(nextState.accessToken).toBe(ACCESS_TOKEN);
+    expect(nextState.refreshToken).toBe(REFRESH_TOKEN);
   });
 
   it('обрабатывает clearAuth', () => {
     const stateWithData = {
       ...initialState,
       isAuth: true,
-      user: { name: 'Test', email: 'test@mail.com' },
-      accessToken: 'abc',
-      refreshToken: 'def',
+      user: TEST_USER,
+      accessToken: ACCESS_TOKEN,
+      refreshToken: REFRESH_TOKEN,
       error: 'error',
       resetPasswordSuccess: true
     };
@@ -63,9 +78,8 @@ describe('authSlice', () => {
 
   it('обрабатывает registerUser.pending', () => {
     const action = registerUser.pending('requestId', {
-      // pending
-      email: 'test@mail.com',
-      name: 'Test',
+      email: TEST_EMAIL,
+      name: TEST_USER.name,
       password: '123456'
     });
     const nextState = authReducer(initialState, action);
@@ -74,44 +88,32 @@ describe('authSlice', () => {
   });
 
   it('обрабатывает registerUser.fulfilled', () => {
-    // fulfilled
-    const payload = {
-      success: true,
-      user: { name: 'Test', email: 'test@mail.com' },
-      accessToken: 'abc',
-      refreshToken: 'def'
-    };
-    const action = registerUser.fulfilled(payload, 'requestId', {
-      email: 'test@mail.com',
-      name: 'Test',
+    const action = registerUser.fulfilled(REGISTER_PAYLOAD, 'requestId', {
+      email: TEST_EMAIL,
+      name: TEST_USER.name,
       password: '123456'
     });
     const nextState = authReducer(initialState, action);
     expect(nextState.loading).toBe(false);
     expect(nextState.isAuth).toBe(true);
-    expect(nextState.user).toEqual(payload.user);
-    expect(nextState.accessToken).toBe('abc');
-    expect(nextState.refreshToken).toBe('def');
+    expect(nextState.user).toEqual(REGISTER_PAYLOAD.user);
+    expect(nextState.accessToken).toBe(ACCESS_TOKEN);
+    expect(nextState.refreshToken).toBe(REFRESH_TOKEN);
   });
 
   it('обрабатывает registerUser.rejected', () => {
-    // rejected
-    const action = registerUser.rejected(
-      new Error('Ошибка регистрации'),
-      'requestId',
-      { email: 'test@mail.com', name: 'Test', password: '123456' }
-    );
+    const action = registerUser.rejected(new Error(ERROR_MSG), 'requestId', {
+      email: TEST_EMAIL,
+      name: TEST_USER.name,
+      password: '123456'
+    });
     const nextState = authReducer(initialState, action);
     expect(nextState.loading).toBe(false);
   });
 
   it('обрабатывает forgotPassword.fulfilled', () => {
-    const forgotPayload = {
-      success: true,
-      message: 'Reset email sent'
-    };
-    const action = forgotPassword.fulfilled(forgotPayload, 'requestId', {
-      email: 'test@mail.com'
+    const action = forgotPassword.fulfilled(FORGOT_PAYLOAD, 'requestId', {
+      email: TEST_EMAIL
     });
     const nextState = authReducer(initialState, action);
     expect(nextState.loading).toBe(false);

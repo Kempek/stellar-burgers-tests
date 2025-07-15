@@ -1,7 +1,13 @@
 import { TIngredient } from '@utils-types';
 import reducer from '../ingredientsSlice';
 
-const mockIngredients: TIngredient[] = [
+const INITIAL_STATE = {
+  items: [],
+  isLoading: false,
+  error: null
+};
+
+const MOCK_INGREDIENTS: TIngredient[] = [
   {
     _id: '643d69a5c3f7b9001cfa093c',
     name: 'Краторная булка N-200i',
@@ -18,20 +24,16 @@ const mockIngredients: TIngredient[] = [
   }
 ];
 
-const initialState = {
-  items: [],
-  isLoading: false,
-  error: null
-};
+const MOCK_ERROR_MESSAGE = 'Ошибка загрузки ингредиентов';
 
 describe('ingredientsSlice', () => {
   it('возвращает initialState по умолчанию', () => {
-    expect(reducer(undefined, { type: 'unknown' })).toEqual(initialState);
+    expect(reducer(undefined, { type: 'unknown' })).toEqual(INITIAL_STATE);
   });
 
   it('устанавливает isLoading=true при fetchIngredients.pending', () => {
     const action = { type: 'ingredients/fetchAll/pending' };
-    const state = reducer(initialState, action);
+    const state = reducer(INITIAL_STATE, action);
     expect(state.isLoading).toBe(true);
     expect(state.error).toBeNull();
   });
@@ -39,20 +41,20 @@ describe('ingredientsSlice', () => {
   it('записывает ингредиенты при fetchIngredients.fulfilled', () => {
     const action = {
       type: 'ingredients/fetchAll/fulfilled',
-      payload: mockIngredients
+      payload: MOCK_INGREDIENTS
     };
-    const state = reducer(initialState, action);
+    const state = reducer(INITIAL_STATE, action);
     expect(state.isLoading).toBe(false);
-    expect(state.items).toEqual(mockIngredients);
+    expect(state.items).toEqual(MOCK_INGREDIENTS);
   });
 
   it('записывает ошибку при fetchIngredients.rejected', () => {
     const action = {
       type: 'ingredients/fetchAll/rejected',
-      error: { message: 'Ошибка загрузки ингредиентов' }
+      error: { message: MOCK_ERROR_MESSAGE }
     };
-    const state = reducer(initialState, action);
+    const state = reducer(INITIAL_STATE, action);
     expect(state.isLoading).toBe(false);
-    expect(state.error).toBe('Ошибка загрузки ингредиентов');
+    expect(state.error).toBe(MOCK_ERROR_MESSAGE);
   });
 });

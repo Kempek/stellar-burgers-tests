@@ -1,37 +1,38 @@
-/// <reference types="cypress" />
-// ***********************************************
-// This example commands.ts shows you how to
-// create various custom commands and overwrite
-// existing commands.
-//
-// For more comprehensive examples of custom
-// commands please read more here:
-// https://on.cypress.io/custom-commands
-// ***********************************************
-//
-//
-// -- This is a parent command --
-// Cypress.Commands.add('login', (email, password) => { ... })
-//
-//
-// -- This is a child command --
-// Cypress.Commands.add('drag', { prevSubject: 'element'}, (subject, options) => { ... })
-//
-//
-// -- This is a dual command --
-// Cypress.Commands.add('dismiss', { prevSubject: 'optional'}, (subject, options) => { ... })
-//
-//
-// -- This will overwrite an existing command --
-// Cypress.Commands.overwrite('visit', (originalFn, url, options) => { ... })
-//
-// declare global {
-//   namespace Cypress {
-//     interface Chainable {
-//       login(email: string, password: string): Chainable<void>
-//       drag(subject: string, options?: Partial<TypeOptions>): Chainable<Element>
-//       dismiss(subject: string, options?: Partial<TypeOptions>): Chainable<Element>
-//       visit(originalFn: CommandOriginalFn, url: string, options: Partial<VisitOptions>): Chainable<Element>
-//     }
-//   }
-// }
+declare global {
+  namespace Cypress {
+    interface Chainable {
+      login(): Chainable<void>;
+      addIngredient(name: string): Chainable<void>;
+      fillConstructor(bunName: string, fillingName: string): Chainable<void>;
+      checkOrderModal(orderNumber: string): Chainable<void>;
+    }
+  }
+}
+
+// Авторизация
+Cypress.Commands.add('login', () => {
+  window.localStorage.setItem('accessToken', 'fake-access-token');
+  cy.setCookie('refreshToken', 'fake-refresh-token');
+});
+
+// Добавление ингредиента по имени
+Cypress.Commands.add('addIngredient', (name: string) => {
+  cy.contains('li', name).find('button').contains('Добавить').click();
+});
+
+// Добавление булки + начинки + клик по кнопке
+Cypress.Commands.add(
+  'fillConstructor',
+  (bunName: string, fillingName: string) => {
+    cy.addIngredient(bunName);
+    cy.addIngredient(fillingName);
+    cy.get('button').contains('Оформить заказ').click();
+  }
+);
+
+// Проверка модалки с заказом
+Cypress.Commands.add('checkOrderModal', (orderNumber: string) => {
+  cy.get('#modals').find('h2').should('contain', orderNumber);
+});
+
+export {};
